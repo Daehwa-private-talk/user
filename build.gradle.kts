@@ -16,6 +16,9 @@ repositories {
 }
 
 dependencies {
+    val flywayVersion = "9.15.2"
+    val springDocVersion = "2.1.0"
+
     // 기타 공통
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -23,6 +26,8 @@ dependencies {
     // DB
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("com.mysql:mysql-connector-j")
+    implementation("org.flywaydb:flyway-mysql:$flywayVersion")
+    testImplementation("org.flywaydb:flyway-mysql:$flywayVersion")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
