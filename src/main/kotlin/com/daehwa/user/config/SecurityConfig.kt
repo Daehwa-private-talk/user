@@ -43,7 +43,7 @@ class SecurityConfig(
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .formLogin { it.disable() }
-            .anonymous { }
+            .anonymous { it.disable() }
             .exceptionHandling {
                 it.authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 it.accessDeniedHandler(jwtAccessDeniedHandler)
