@@ -1,4 +1,4 @@
-package com.daehwa.user.model.base_response
+package com.daehwa.user.dto.base_response
 
 import org.springframework.http.HttpStatus
 

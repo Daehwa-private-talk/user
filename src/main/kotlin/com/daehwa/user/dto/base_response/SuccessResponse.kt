@@ -1,4 +1,4 @@
-package com.daehwa.user.model.base_response
+package com.daehwa.user.dto.base_response
 
 class SuccessResponse<T : Any?>(status: Status, result: T) : BaseResponse<T>(true, status, result) {
     companion object {

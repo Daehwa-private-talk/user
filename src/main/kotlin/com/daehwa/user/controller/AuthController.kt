@@ -1,7 +1,9 @@
 package com.daehwa.user.controller
 
+import com.daehwa.user.dto.SignInRequest
+import com.daehwa.user.dto.SignInResponse
 import com.daehwa.user.dto.SignUpRequest
-import com.daehwa.user.model.base_response.SuccessResponse
+import com.daehwa.user.dto.base_response.SuccessResponse
 import com.daehwa.user.service.AuthService
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.PostMapping
@@ -19,4 +21,8 @@ class AuthController(
         authService.signUp(request)
         return SuccessResponse.DEFAULT
     }
+
+    @PostMapping("/sign-in")
+    fun signIn(@RequestBody @Valid request: SignInRequest): SuccessResponse<SignInResponse> =
+        SuccessResponse.of(authService.signIn(request))
 }

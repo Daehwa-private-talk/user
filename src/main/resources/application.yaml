@@ -29,3 +29,12 @@ open-api:
 springdoc:
   api-docs:
     path: /api-docs
+
+token:
+  secret-key: ${SECRET_KEY}
+  access-token-expire-time: 1
+  refresh-token-renew-hour: ${REFRESH_TOKEN_RENEW_HOUR}
+
+jasypt:
+  encrypt-key: ${JASYPT_ENCRYPT_KEY}
+  algorithm: ${JASYPT_ALGORITHM}
