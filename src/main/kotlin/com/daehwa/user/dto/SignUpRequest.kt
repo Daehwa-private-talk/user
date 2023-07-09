@@ -1,4 +1,4 @@
-package com.daehwa.user.model
+package com.daehwa.user.dto
 
 import jakarta.validation.constraints.Email
 

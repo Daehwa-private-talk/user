@@ -1,10 +1,16 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "3.0.2"
+    val kotlinVersion = "1.8.22"
+    val springBootVersion = "3.0.2"
+
     id("io.spring.dependency-management") version "1.1.0"
-    kotlin("jvm") version "1.7.22"
-    kotlin("plugin.spring") version "1.7.22"
+    id("org.springframework.boot") version springBootVersion
+    id("org.jetbrains.kotlin.plugin.allopen") version kotlinVersion
+    id("org.jetbrains.kotlin.plugin.noarg") version kotlinVersion
+
+    kotlin("jvm") version kotlinVersion
+    kotlin("plugin.spring") version kotlinVersion
 }
 
 group = "com.daehwa"
@@ -18,10 +24,17 @@ repositories {
 dependencies {
     val flywayVersion = "9.15.2"
     val springDocVersion = "2.1.0"
+    val kotlinLoggingVersion = "3.0.5"
 
     // 기타 공통
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
+
+    // 시큐리티
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.security:spring-security-test")
 
     // spring doc
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
@@ -33,6 +46,16 @@ dependencies {
     testImplementation("org.flywaydb:flyway-mysql:$flywayVersion")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+noArg {
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.MappedSuperclass")
+}
+
+allOpen {
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.MappedSuperclass")
 }
 
 tasks.withType<KotlinCompile> {
