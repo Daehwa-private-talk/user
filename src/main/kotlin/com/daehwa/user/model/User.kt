@@ -19,22 +19,23 @@ class User(
     val password: String,
     val name: String,
     val nickname: String,
-    var nonce: String? = null,
+    var refreshToken: String? = null,
     var refreshTokenExpiredAt: LocalDateTime? = null,
+    var signInAt: LocalDateTime? = null,
     @Column(name = "is_enabled", columnDefinition = "TINYINT")
-    val enabled: Boolean,
+    val enabled: Boolean = true,
     @Column(name = "is_deleted", columnDefinition = "TINYINT")
-    val deleted: Boolean,
+    val deleted: Boolean = false,
 ) : BaseEntity() {
     fun updateRefreshToken(
+        refreshToken: String,
         refreshTokenExpiredAt: LocalDateTime,
     ) {
+        this.refreshToken = refreshToken
         this.refreshTokenExpiredAt = refreshTokenExpiredAt
     }
 
-    fun updateNonce(
-        nonce: String,
-    ) {
-        this.nonce = nonce
+    fun updateSignInAt(signInAt: LocalDateTime) {
+        this.signInAt = signInAt
     }
 }

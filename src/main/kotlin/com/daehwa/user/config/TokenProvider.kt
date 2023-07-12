@@ -4,9 +4,11 @@ import com.daehwa.user.config.JasyptConfig.Companion.JASYPT_ENCRYPTOR
 import com.daehwa.user.dto.UserJwtToken
 import com.daehwa.user.model.User
 import com.daehwa.user.utils.UUIDUtils
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.transaction.Transactional
 import org.jasypt.encryption.StringEncryptor
 import org.springframework.beans.factory.annotation.Qualifier
@@ -21,6 +23,10 @@ class TokenProvider(
     private val jasypt: StringEncryptor,
 ) {
     private val signingKey = Keys.hmacShaKeyFor(tokenProperty.secretKey.toByteArray())
+
+    companion object {
+        const val AUTHORIZATION_HEADER = "Authorization"
+    }
 
     fun createRefreshToken(): String = UUIDUtils.generate()
 
@@ -44,4 +50,37 @@ class TokenProvider(
     }
 
     private fun getClaims(email: String, nonce: String) = mapOf("email" to email, "nonce" to nonce)
+
+    fun resolveToken(request: HttpServletRequest): String? {
+        val accessTokenCookie = request.cookies?.firstOrNull { it.name == "daehwa.access_token" }
+
+        return accessTokenCookie?.value ?: request.getHeader(AUTHORIZATION_HEADER)
+    }
+
+    fun isValidateToken(token: String?): Boolean {
+        return try {
+            val claims: Claims = Jwts.parserBuilder()
+                .setSigningKey(signingKey)
+                .build()
+                .parseClaimsJws(token)
+                .body
+
+            isNotExpired(claims)
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun isNotExpired(claims: Claims): Boolean = !claims.expiration.before(Date())
+
+    fun getRefreshToken(token: String): String {
+        val nonce = Jwts.parserBuilder()
+            .setSigningKey(signingKey)
+            .build()
+            .parseClaimsJws(token)
+            .body["nonce"]
+            .toString()
+
+        return jasypt.decrypt(nonce).split("*")[0]
+    }
 }

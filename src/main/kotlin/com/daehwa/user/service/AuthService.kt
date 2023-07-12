@@ -33,8 +33,6 @@ class AuthService(
                 password = passwordEncoder.encode(password),
                 name = name,
                 nickname = nickname,
-                enabled = true,
-                deleted = false,
             )
         )
     }
@@ -65,15 +63,16 @@ class AuthService(
     }
 
     private fun createAccessJwt(user: User, refreshToken: String): UserJwtToken {
-        val userJwtToken = tokenProvider.createAccessToken(user, refreshToken)
-        user.updateNonce(userJwtToken.nonce)
+        val token = tokenProvider.createAccessToken(user, refreshToken)
+        user.updateSignInAt(LocalDateTime.now())
 
-        return userJwtToken
+        return token
     }
 
     private fun createRefreshJwt(user: User): String {
         val refreshToken = tokenProvider.createRefreshToken()
         user.updateRefreshToken(
+            refreshToken = refreshToken,
             refreshTokenExpiredAt = LocalDateTime.now().plusHours(tokenProperty.refreshTokenRenewHour)
         )
         return refreshToken

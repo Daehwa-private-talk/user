@@ -1,0 +1,77 @@
+package com.daehwa.user.config
+
+import com.daehwa.user.common.DaehwaException
+import com.daehwa.user.common.ErrorCode
+import com.daehwa.user.repository.UserRepository
+import com.daehwa.user.utils.CookieUtils
+import jakarta.servlet.FilterChain
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+import org.springframework.stereotype.Component
+import org.springframework.web.filter.OncePerRequestFilter
+import java.time.LocalDateTime
+
+@Component
+class JwtAuthenticationFilter(
+    private val tokenProvider: TokenProvider,
+    private val userRepository: UserRepository,
+) : OncePerRequestFilter() {
+    companion object {
+        private const val COOKIE_KEY = "daehwa.access_token"
+        private const val ACCESS_TOKEN_EXPIRE_HOUR = 2L
+    }
+
+    override fun doFilterInternal(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        filterChain: FilterChain
+    ) {
+        val token: String? = tokenProvider.resolveToken(request)
+
+        if (validateToken(token)) {
+            /**
+             * (중복 로그인 체크)
+             * 1. nonce에서 refresh token 가져옴
+             * 2. user 가져옴
+             * 3. user의 nonce의 refresh token 비교 (틀리면 중복 로그인 -> cache 비움) 에러 처리는 EXPIRED로 정해서 내려줌
+             * 4. authentication 추가해줌
+             * 5. 에러 핸들러 필터 추가 [response에 에러 응답 추가]
+             * 6. AuthenticatedUser 추가
+             */
+
+            val refreshToken = tokenProvider.getRefreshToken(token!!)
+
+            val user = userRepository.findByRefreshToken(refreshToken) ?: kotlin.run {
+                expireAccessToken(request, response)
+                throw DaehwaException(ErrorCode.DUPLICATED_LOGIN, "중복 로그인 되었습니다.")
+            }
+
+            validateSignInAt(user.signInAt!!)
+//            tokenProvider.getAuthentication(user)
+
+            filterChain.doFilter(request, response)
+        }
+    }
+
+    private fun validateToken(token: String?) = tokenProvider.isValidateToken(token)
+    private fun validateSignInAt(signInAt: LocalDateTime) {
+        if (signInAt.plusHours(ACCESS_TOKEN_EXPIRE_HOUR).isBefore(LocalDateTime.now())) {
+            throw DaehwaException(ErrorCode.UNAUTHORIZED, "만료된 access token 입니다.")
+        }
+    }
+
+
+    private fun expireAccessToken(request: HttpServletRequest, response: HttpServletResponse) {
+        request.cookies?.firstOrNull { it.name == COOKIE_KEY }?.let {
+            CookieUtils.addCookie(
+                response = response,
+                key = COOKIE_KEY,
+                value = "",
+                path = "/",
+                minuteMaxAge = 0,
+                httpOnly = true,
+                secured = true
+            )
+        }
+    }
+}
