@@ -45,7 +45,7 @@ class SecurityConfig(
     }
 
     private fun HttpSecurity.defaultConfigure(): HttpSecurity {
-        return cors { it.disable() }
+        return cors { }
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .formLogin { it.disable() }
