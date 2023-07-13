@@ -1,5 +1,7 @@
 package com.daehwa.user.service
 
+import com.daehwa.user.common.exception.DaehwaException
+import com.daehwa.user.common.exception.ErrorCode
 import com.daehwa.user.config.TokenProperty
 import com.daehwa.user.config.TokenProvider
 import com.daehwa.user.dto.SignInRequest
@@ -7,10 +9,9 @@ import com.daehwa.user.dto.SignInResponse
 import com.daehwa.user.dto.SignUpRequest
 import com.daehwa.user.dto.TokenResponse
 import com.daehwa.user.dto.UserJwtToken
-import com.daehwa.user.model.User
+import com.daehwa.user.model.DaehwaUser
 import com.daehwa.user.repository.UserRepository
 import jakarta.transaction.Transactional
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -23,12 +24,12 @@ class AuthService(
     private val tokenProvider: TokenProvider,
 ) {
     @Transactional
-    fun signUp(request: SignUpRequest): User {
+    fun signUp(request: SignUpRequest): DaehwaUser {
         val (email, password, name, nickname) = request
         validateEmail(email)
 
         return userRepository.save(
-            User(
+            DaehwaUser(
                 email = email,
                 password = passwordEncoder.encode(password),
                 name = name,
@@ -39,14 +40,14 @@ class AuthService(
 
     private fun validateEmail(email: String) {
         if (userRepository.existsByEmail(email)) {
-            throw IllegalArgumentException("이미 존재하는 email 입니다")
+            throw DaehwaException(ErrorCode.DUPLICATED, "이미 존재하는 email 입니다")
         }
     }
 
     @Transactional
     fun signIn(request: SignInRequest): SignInResponse {
         val user = userRepository.findByEmail(request.email)
-            ?: throw NotFoundException()
+            ?: throw DaehwaException(ErrorCode.NOT_FOUND)
 
         validateUser(user, request.password)
 
@@ -62,14 +63,14 @@ class AuthService(
         )
     }
 
-    private fun createAccessJwt(user: User, refreshToken: String): UserJwtToken {
+    private fun createAccessJwt(user: DaehwaUser, refreshToken: String): UserJwtToken {
         val token = tokenProvider.createAccessToken(user, refreshToken)
         user.updateSignInAt(LocalDateTime.now())
 
         return token
     }
 
-    private fun createRefreshJwt(user: User): String {
+    private fun createRefreshJwt(user: DaehwaUser): String {
         val refreshToken = tokenProvider.createRefreshToken()
         user.updateRefreshToken(
             refreshToken = refreshToken,
@@ -78,13 +79,17 @@ class AuthService(
         return refreshToken
     }
 
-    private fun validateUser(user: User?, password: String) {
+    private fun validateUser(user: DaehwaUser?, password: String) {
         if (user == null) {
-            throw IllegalArgumentException("회원이 존재하지 않습니다")
+            throw DaehwaException(ErrorCode.NOT_FOUND, "회원이 존재하지 않습니다")
         }
 
         if (!passwordEncoder.matches(password, user.password)) {
-            throw IllegalArgumentException("비밀번호가 일치하지 않습니다")
+            throw DaehwaException(ErrorCode.BAD_REQUEST, "비밀번호가 일치하지 않습니다")
         }
+    }
+
+    fun getAuthentication() {
+
     }
 }

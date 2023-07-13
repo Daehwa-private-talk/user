@@ -29,10 +29,12 @@ open-api:
 springdoc:
   api-docs:
     path: /api-docs
+  swagger-ui:
+    path: /index.html
 
 token:
   secret-key: ${SECRET_KEY}
-  access-token-expire-time: 1
+  access-token-expire-time: 7200000000000
   refresh-token-renew-hour: ${REFRESH_TOKEN_RENEW_HOUR}
 
 jasypt:

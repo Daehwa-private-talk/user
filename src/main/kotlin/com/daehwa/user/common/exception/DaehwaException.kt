@@ -1,4 +1,4 @@
-package com.daehwa.user.common
+package com.daehwa.user.common.exception
 
 
 class DaehwaException(

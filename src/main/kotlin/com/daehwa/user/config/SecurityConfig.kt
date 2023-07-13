@@ -16,13 +16,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.stereotype.Component
 
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
-    private val jwtAccessDeniedHandler: JwtAccessDeniedHandler
+    private val jwtAccessDeniedHandler: JwtAccessDeniedHandler,
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    private val exceptionHandlerFilter: ExceptionHandlerFilter,
 ) {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -30,25 +33,27 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it
                     .requestMatchers(
-                  *SecurityRequestUriUtils.getGlobalAllowedUris().toTypedArray()
-                ).permitAll()
+                        *SecurityRequestUriUtils.getGlobalAllowedUris().toTypedArray()
+                    ).permitAll()
                     .anyRequest().authenticated()
             }
+
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter::class.java)
 
         return http.build()
     }
 
     private fun HttpSecurity.defaultConfigure(): HttpSecurity {
-        return cors { }
+        return cors { it.disable() }
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .formLogin { it.disable() }
-            .anonymous { it.disable() }
+            .anonymous { }
             .exceptionHandling {
                 it.authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 it.accessDeniedHandler(jwtAccessDeniedHandler)
             }
-
     }
 
     @Bean
@@ -87,8 +92,6 @@ class JwtAccessDeniedHandler : AccessDeniedHandler {
             "JwtAccessDeniedHandler exception has occureed. URL [${HttpServletUtils.getFullURL(request)}]",
             accessDeniedException
         )
-
         response.sendError(HttpServletResponse.SC_FORBIDDEN)
     }
-
 }

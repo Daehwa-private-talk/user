@@ -2,7 +2,9 @@ package com.daehwa.user.config
 
 import com.daehwa.user.config.JasyptConfig.Companion.JASYPT_ENCRYPTOR
 import com.daehwa.user.dto.UserJwtToken
-import com.daehwa.user.model.User
+import com.daehwa.user.model.AuthenticatedUser
+import com.daehwa.user.model.DaehwaUser
+import com.daehwa.user.repository.UserRepository
 import com.daehwa.user.utils.UUIDUtils
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
@@ -12,6 +14,9 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.transaction.Transactional
 import org.jasypt.encryption.StringEncryptor
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.util.*
@@ -31,7 +36,7 @@ class TokenProvider(
     fun createRefreshToken(): String = UUIDUtils.generate()
 
     @Transactional
-    fun createAccessToken(user: User, refreshToken: String): UserJwtToken {
+    fun createAccessToken(user: DaehwaUser, refreshToken: String): UserJwtToken {
         val nonce = jasypt.encrypt(refreshToken + "*" + LocalDateTime.now())
         val claims = getClaims(user.email, nonce)
         val now = Date()
@@ -71,7 +76,7 @@ class TokenProvider(
         }
     }
 
-    private fun isNotExpired(claims: Claims): Boolean = !claims.expiration.before(Date())
+    private fun isNotExpired(claims: Claims): Boolean = claims.expiration.after(Date())
 
     fun getRefreshToken(token: String): String {
         val nonce = Jwts.parserBuilder()
@@ -82,5 +87,18 @@ class TokenProvider(
             .toString()
 
         return jasypt.decrypt(nonce).split("*")[0]
+    }
+
+    fun getAuthentication(user: DaehwaUser): Authentication {
+        val authenticatedUser = AuthenticatedUser(
+            name = user.name,
+            password = user.password,
+            authorities = listOf(SimpleGrantedAuthority(user.role.getRoleName())),
+            id = user.id,
+            email = user.email,
+            nickname = user.nickname,
+        )
+
+        return UsernamePasswordAuthenticationToken(authenticatedUser, null, authenticatedUser.authorities)
     }
 }

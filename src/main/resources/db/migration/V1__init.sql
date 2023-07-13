@@ -1,7 +1,7 @@
 -- user
-DROP TABLE IF EXISTS `user`;
+DROP TABLE IF EXISTS `daehwa_user`;
 
-CREATE TABLE IF NOT EXISTS `user`
+CREATE TABLE IF NOT EXISTS `daehwa_user`
 (
     `id`                        INT          NOT NULL AUTO_INCREMENT,
     `email`                     VARCHAR(255) NOT NULL,
@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `user`
     `refresh_token`             VARCHAR(100) NULL,
     `refresh_token_expired_at`  DATETIME     NULL,
     `sign_in_at`                DATETIME     NULL,
+    `role`                      VARCHAR(20)  NOT NULL,
     `is_enabled`                TINYINT      NOT NULL,
     `is_deleted`                TINYINT      NOT NULL,
     `created_at`                DATETIME     NOT NULL,

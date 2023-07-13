@@ -6,6 +6,8 @@ import com.daehwa.user.dto.SignUpRequest
 import com.daehwa.user.dto.base_response.SuccessResponse
 import com.daehwa.user.service.AuthService
 import jakarta.validation.Valid
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -25,4 +27,9 @@ class AuthController(
     @PostMapping("/sign-in")
     fun signIn(@RequestBody @Valid request: SignInRequest): SuccessResponse<SignInResponse> =
         SuccessResponse.of(authService.signIn(request))
+
+    @GetMapping("/test")
+    fun getUser(): SuccessResponse<String> {
+        return SuccessResponse.of("good")
+    }
 }

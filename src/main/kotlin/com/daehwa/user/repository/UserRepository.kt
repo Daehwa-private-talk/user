@@ -1,10 +1,10 @@
 package com.daehwa.user.repository
 
-import com.daehwa.user.model.User
+import com.daehwa.user.model.DaehwaUser
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface UserRepository : JpaRepository<User, Int> {
+interface UserRepository : JpaRepository<DaehwaUser, Int> {
     fun existsByEmail(email: String): Boolean
-    fun findByEmail(email: String): User?
-    fun findByRefreshToken(refreshToken: String): User?
+    fun findByEmail(email: String): DaehwaUser?
+    fun findByRefreshToken(refreshToken: String): DaehwaUser?
 }

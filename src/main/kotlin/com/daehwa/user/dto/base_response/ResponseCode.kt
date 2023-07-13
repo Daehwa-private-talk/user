@@ -17,6 +17,6 @@ enum class ResponseCode(val code: Int, val httpStatus: HttpStatus) {
     BAD_REQUEST(4000, HttpStatus.BAD_REQUEST),
     GONE(4100, HttpStatus.GONE),
     DUPLICATED_LOGIN(4009, HttpStatus.CONFLICT),
-    EXPIRED(4006, HttpStatus.NOT_ACCEPTABLE),
+    EXPIRED(4108, HttpStatus.I_AM_A_TEAPOT),
     ;
 }

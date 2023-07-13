@@ -1,4 +1,4 @@
-package com.daehwa.user.common
+package com.daehwa.user.common.exception
 
 import com.daehwa.user.dto.base_response.ResponseCode
 import org.springframework.boot.logging.LogLevel
