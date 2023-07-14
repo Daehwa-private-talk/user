@@ -1,10 +1,8 @@
 package com.daehwa.user.config
 
 import com.daehwa.user.config.JasyptConfig.Companion.JASYPT_ENCRYPTOR
-import com.daehwa.user.dto.UserJwtToken
 import com.daehwa.user.model.AuthenticatedUser
 import com.daehwa.user.model.DaehwaUser
-import com.daehwa.user.repository.UserRepository
 import com.daehwa.user.utils.UUIDUtils
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
@@ -36,27 +34,22 @@ class TokenProvider(
     fun createRefreshToken(): String = UUIDUtils.generate()
 
     @Transactional
-    fun createAccessToken(user: DaehwaUser, refreshToken: String): UserJwtToken {
+    fun createAccessToken(user: DaehwaUser, refreshToken: String): String {
         val nonce = jasypt.encrypt(refreshToken + "*" + LocalDateTime.now())
         val claims = getClaims(user.email, nonce)
         val now = Date()
 
-        val jwtToken = Jwts.builder()
+        return Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(now)
             .setExpiration(Date(now.time + tokenProperty.accessTokenExpireTime))
             .signWith(signingKey, SignatureAlgorithm.HS256)
             .compact()
-
-        return UserJwtToken(
-            accessToken = jwtToken,
-            nonce = nonce
-        )
     }
 
     private fun getClaims(email: String, nonce: String) = mapOf("email" to email, "nonce" to nonce)
 
-    fun resolveToken(request: HttpServletRequest): String? {
+    fun resolveAccessToken(request: HttpServletRequest): String? {
         val accessTokenCookie = request.cookies?.firstOrNull { it.name == "daehwa.access_token" }
 
         return accessTokenCookie?.value ?: request.getHeader(AUTHORIZATION_HEADER)

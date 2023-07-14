@@ -28,7 +28,7 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val token: String? = tokenProvider.resolveToken(request)
+        val token: String? = tokenProvider.resolveAccessToken(request)
 
         if (validateToken(token)) {
             val refreshToken = tokenProvider.getRefreshToken(token!!)

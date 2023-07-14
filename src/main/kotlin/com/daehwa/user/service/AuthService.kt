@@ -8,7 +8,6 @@ import com.daehwa.user.dto.SignInRequest
 import com.daehwa.user.dto.SignInResponse
 import com.daehwa.user.dto.SignUpRequest
 import com.daehwa.user.dto.TokenResponse
-import com.daehwa.user.dto.UserJwtToken
 import com.daehwa.user.model.DaehwaUser
 import com.daehwa.user.repository.UserRepository
 import jakarta.transaction.Transactional
@@ -52,18 +51,18 @@ class AuthService(
         validateUser(user, request.password)
 
         val refreshToken = createRefreshJwt(user)
-        val jwtToken = createAccessJwt(user, refreshToken)
+        val accessToken = createAccessJwt(user, refreshToken)
 
         return SignInResponse(
             email = user.email,
             TokenResponse(
-                accessToken = jwtToken.accessToken,
+                accessToken = accessToken,
                 refreshToken = refreshToken,
             )
         )
     }
 
-    private fun createAccessJwt(user: DaehwaUser, refreshToken: String): UserJwtToken {
+    private fun createAccessJwt(user: DaehwaUser, refreshToken: String): String {
         val token = tokenProvider.createAccessToken(user, refreshToken)
         user.updateSignInAt(LocalDateTime.now())
 
@@ -89,7 +88,16 @@ class AuthService(
         }
     }
 
-    fun getAuthentication() {
+    @Transactional
+    fun refresh(refreshToken: String): TokenResponse {
+        val user = userRepository.findByRefreshToken(refreshToken)
+            ?: throw DaehwaException(ErrorCode.NOT_FOUND, "refresh 대상 회원이 존재하지 않습니다.")
 
+        val newRefreshToken = createRefreshJwt(user)
+
+        return TokenResponse(
+            refreshToken = newRefreshToken,
+            accessToken = createAccessJwt(user, newRefreshToken)
+        )
     }
 }

@@ -9,6 +9,7 @@ object SecurityRequestUriUtils {
         "/api-docs",
         "/v1/api/auth/sign-up",
         "/v1/api/auth/sign-in",
+        "/v1/api/auth/token/refresh"
     )
 
     fun getGlobalAllowedUris(): List<String> {
