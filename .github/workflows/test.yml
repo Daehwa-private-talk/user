@@ -39,4 +39,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: daehwa/auth-service:latest
+          tags: rkdl0829/auth-service:latest
