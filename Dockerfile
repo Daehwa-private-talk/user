@@ -1,5 +1,7 @@
 FROM amazoncorretto:17.0.7-al2023-headless
 
+RUN echo ls
+
 COPY build/libs/user-0.0.1-SNAPSHOT.jar ./auth-service.jar
 
 EXPOSE 8080
