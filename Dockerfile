@@ -5,4 +5,4 @@ COPY .env ./env
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "auth-service.jar", "--spring.config.name=.env"]
+CMD ["java", "-jar", "auth-service.jar"]
