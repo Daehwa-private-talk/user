@@ -49,5 +49,5 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            docker pull rkdl0829/auth-service
-            docker run -p 8080:8080 --env-file test-env  auth-service
+            sudo docker pull rkdl0829/auth-service
+            sudo docker run -p 8080:8080 --env-file test-env  rkdl0829/auth-service
