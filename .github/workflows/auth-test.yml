@@ -39,7 +39,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: rkdl0829/auth-service:${{ github.run_number }}
+          tags: rkdl0829/auth-service:latest
 
       - name: EC2 Docker Run
         uses: appleboy/ssh-action@master
