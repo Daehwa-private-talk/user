@@ -48,5 +48,6 @@ jobs:
           username: ec2-user
           key: ${{ secrets.SERVER_KEY }}
           script: |
+            ssh -i "ec2-key.pem" ec2-user@${{ secrets.PRIVATE_SERVER_HOST }}
             sudo docker pull rkdl0829/auth-service
             sudo docker run -p 8080:8080 --env-file test-env  rkdl0829/auth-service
