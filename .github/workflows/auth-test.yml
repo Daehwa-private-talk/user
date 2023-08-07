@@ -51,4 +51,4 @@ jobs:
             ssh -i "ec2-key.pem" ec2-user@${{ secrets.PRIVATE_SERVER_HOST }}
             kill -9 $(lsof -t -i:8080 -sTCP:LISTEN)
             sudo docker pull rkdl0829/auth-service
-            sudo docker run -p 8080:8080 --env-file test-env  rkdl0829/auth-service
+            sudo docker run -d -p 8080:8080 --env-file test-env  rkdl0829/auth-service
