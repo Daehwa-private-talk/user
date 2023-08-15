@@ -1,0 +1,61 @@
+name: daehwa api CD
+
+on:
+  push:
+    branches: ["main"]
+
+env:
+  S3_BUCKET_NAME: daehwa-s3
+  S3_PATH: deploy/backend
+  CODE_DEPLOY_APPLICATION_NAME: daehwa-cd
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: daehwa-backend
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Build with gradle
+        run: |
+          ./gradlew clean
+          ./gradlew build -x test
+
+      - name: Prepare contents
+        run: |
+          mkdir -p user/deploy
+          cp user/build/libs/*.jar user/deploy
+          cp ./appspec/appspec.yml user/deploy/
+          cp ./appspec/user-deploy.sh user/deploy/
+          zip -r -qq -j user.zip user/deploy/*
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Upload to S3
+        run: aws s3 cp \
+          --region ap-northeast-2 \
+          ./user.zip s3://$S3_BUCKET_NAME/$S3_PATH/
+
+      - name: Code Deploy
+        run: |
+          aws deploy create-deployment \
+          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+          --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+          --file-exists-behavior OVERWRITE \
+          --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$S3_BUCKET_NAME/$S3_PATH/user.zip
+
+
