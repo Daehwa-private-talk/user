@@ -32,11 +32,11 @@ jobs:
 
       - name: Prepare contents
         run: |
-          mkdir -p user/deploy
-          cp user/build/libs/*.jar user/deploy/
-          cp ./appspec/appspec.yml user/deploy/
-          cp ./appspec/user-deploy.sh user/deploy/
-          zip -r -qq -j user.zip user/deploy/*
+          mkdir deploy
+          cp ./build/libs/*.jar ./deploy/
+          cp ./appspec/appspec.yml ./deploy/
+          cp ./appspec/user-deploy.sh ./deploy/
+          zip -r -qq -j user.zip ./deploy/*
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
