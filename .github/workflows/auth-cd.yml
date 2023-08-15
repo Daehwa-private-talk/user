@@ -32,8 +32,8 @@ jobs:
 
       - name: Prepare contents
         run: |
-          mkdir deploy
-          cp build/libs/*.jar deploy
+          mkdir -p user/deploy
+          cp user/build/libs/*.jar user/deploy/
           cp ./appspec/appspec.yml user/deploy/
           cp ./appspec/user-deploy.sh user/deploy/
           zip -r -qq -j user.zip user/deploy/*
