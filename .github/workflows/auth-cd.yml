@@ -60,6 +60,6 @@ jobs:
           --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
           --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
           --file-exists-behavior OVERWRITE \
-          --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$S3_BUCKET_NAME/$S3_PATH/user.zip
+          --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$S3_PATH/user.zip
 
 
