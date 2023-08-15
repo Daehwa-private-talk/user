@@ -19,7 +19,7 @@ chmod +x $JAR_NAME
 
 echo "> $JAR_NAME 실행"
 
-sudo nohup java -jar --spring.config.location=/home/ec2-user/config/application.yaml $JAR_NAME > /home/ec2-user/springlogs/spring.log 2>&1 &
+sudo nohup java -jar $JAR_NAME --spring.config.location=/home/ec2-user/config/application.yaml > /home/ec2-user/springlogs/spring.log 2>&1 &
 
 tail -f springlogs/spring.log
 
