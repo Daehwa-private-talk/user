@@ -51,7 +51,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: aws s3 cp \
           --region ap-northeast-2 \
-          user.zip s3://$S3_BUCKET_NAME/$S3_PATH/
+          user.zip s3://daehwa-s3/deploy/backend/
 
       - name: Code Deploy
         run: |
