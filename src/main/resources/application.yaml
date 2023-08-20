@@ -22,6 +22,9 @@ spring:
     enabled: true
     baseline-on-migrate: false
     locations: classpath:db/migration
+  security:
+    cors:
+      allow-origins: ${CORS_ALLOW_ORIGINS}
 
 open-api:
   server: ${AUTH_URL}
