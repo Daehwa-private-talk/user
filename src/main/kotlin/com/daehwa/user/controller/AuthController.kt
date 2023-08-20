@@ -33,7 +33,6 @@ class AuthController(
     fun refresh(@RequestParam refreshToken: String): SuccessResponse<TokenResponse> =
         SuccessResponse.of(authService.refresh(refreshToken))
 
-
     @GetMapping("/test")
     fun getUser(): SuccessResponse<String> {
         return SuccessResponse.of("good")
