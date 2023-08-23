@@ -11,7 +11,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 class CorsConfig(
-    @Value("\n{spring.security.cors.allow-origins}")
+    @Value("\${spring.security.cors.allow-origins}")
     private val allowOrigins: List<String>,
 ) {
     private val logger = KotlinLogging.logger { }
