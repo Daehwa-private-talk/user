@@ -24,7 +24,11 @@ class CorsConfig(
         val configuration = CorsConfiguration()
         configuration.allowedOrigins = allowOrigins
         configuration.allowedHeaders = getAllowHeaders()
-        configuration.exposedHeaders = listOf(HttpHeaders.CONTENT_DISPOSITION)
+        configuration.exposedHeaders = listOf(
+            HttpHeaders.CONTENT_DISPOSITION,
+            HttpHeaders.CONTENT_TYPE,
+            "Authorization",
+        )
         configuration.allowedMethods = arrayListOf("GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH")
         configuration.allowCredentials = true
 
