@@ -1,6 +1,7 @@
 package com.daehwa.user.config
 
 import mu.KotlinLogging
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
@@ -10,6 +11,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 class CorsConfig(
+    @Value("\n{spring.security.cors.allow-origins}")
     private val allowOrigins: List<String>,
 ) {
     private val logger = KotlinLogging.logger { }
