@@ -19,6 +19,10 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://build.shibboleth.net/nexus/content/repositories/releases/")
+    }
+
 }
 
 dependencies {
@@ -50,6 +54,14 @@ dependencies {
     implementation("com.mysql:mysql-connector-j")
     implementation("org.flywaydb:flyway-mysql:$flywayVersion")
     testImplementation("org.flywaydb:flyway-mysql:$flywayVersion")
+
+    // saml
+    implementation("org.opensaml:opensaml-core:4.1.1")
+    implementation("org.opensaml:opensaml-saml-api:4.1.1")
+    implementation("org.opensaml:opensaml-saml-impl:4.1.1")
+    implementation("org.springframework.security:spring-security-saml2-service-provider")
+
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
